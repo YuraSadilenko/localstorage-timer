@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Document</title>
+</head>
+<body>
+
+  <div id="iid" class="timer-countdown">
+    <div class="countdown-number">
+      <span class="days countdown-time">00</span>:
+    </div>
+    <div class="countdown-number">
+      <span class="hours countdown-time">24</span>:
+    </div>
+    <div class="countdown-number">
+      <span class="minutes countdown-time">00</span>:
+    </div>
+    <div class="countdown-number">
+      <span class="seconds countdown-time">00</span>
+    </div>
+  </div>
+
+    <script>
+
+        let DateBox = [];
+        // get what is already there
+        if (localStorage.getItem('date'))
+        DateBox = JSON.parse(localStorage.getItem('date'));
+
+        let currentTime = {
+            time: Date.parse(new Date()),
+        }
+
+        DateBox.push(currentTime);
+        DateBox.splice(1);
+
+        localStorage.setItem('date', JSON.stringify(DateBox));
+        let firstEntrance = DateBox[0].time;
+
+        function getRemainingTime(endtime) {
+            let sprint = endtime - Date.parse(new Date());
+
+            let seconds = Math.floor((sprint / 1000) % 60);
+            let minutes = Math.floor((sprint / 1000 / 60) % 60);
+            let hours = Math.floor((sprint / (1000 * 60 * 60)) % 24);
+            let days = Math.floor((sprint / (1000 * 60 * 60 * 24)) % 365);
+
+            return {
+                sprint: sprint,
+                hours: hours,
+                minutes: minutes,
+                seconds: seconds
+            };
+        }
+
+        function initializeClock(id, endtime) {
+            var clock = document.getElementById(id);
+            var hoursSpan = clock.querySelector(".hours");
+            var minutesSpan = clock.querySelector(".minutes");
+            var secondsSpan = clock.querySelector(".seconds");
+
+            function updateClock() {
+                var sprint = getRemainingTime(endtime);
+
+                if (sprint.seconds < 0) {
+                    clearInterval(timeinterval);
+                    initializeClock("iid", new Date(Date.parse(new Date()) + 60 * 25 * 1000));
+                    return true;
+                }
+
+                hoursSpan.innerHTML = ("0" + sprint.hours).slice(-2);
+                minutesSpan.innerHTML = ("0" + sprint.minutes).slice(-2);
+                secondsSpan.innerHTML = ("0" + sprint.seconds).slice(-2);
+            }
+
+            updateClock();
+            var timeinterval = setInterval(updateClock, 1000);
+        }
+
+        let deadline = firstEntrance + 60 * 60 * 24 * 1000;
+
+        initializeClock("iid", deadline);
+
+        console.log(initializeClock("iid", deadline));
+
+    </script>
+
+</body>
+</html>
